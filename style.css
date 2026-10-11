@@ -100,9 +100,13 @@ main{flex:1;position:relative}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
 /* ---------- Mobile ---------- */
+#grip{display:none}
+
 @media(max-width:700px){
   body{flex-direction:column-reverse}
-  #panel{width:100%;min-width:0;height:42%;border-right:0;border-top:1px solid var(--line);padding:18px 16px 12px}
+  #panel{width:100%;min-width:0;height:var(--ph,42%);border-right:0;border-top:1px solid var(--line);padding:0 16px 12px}
+  #grip{display:block;height:30px;margin:0 -16px;position:relative;cursor:grab;touch-action:none}
+  #grip::after{content:"";position:absolute;left:50%;top:12px;width:44px;height:4px;margin-left:-22px;border-radius:2px;background:var(--dim)}
   h1{font-size:20px;margin-bottom:12px}
   .big{font-size:38px}
   .tabs{margin-top:16px}
