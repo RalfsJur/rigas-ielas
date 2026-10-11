@@ -1,16 +1,15 @@
-// ---- Rīgas ielu spēle ----
 const KEY = 'rigas_ielas_v1';
 let streets = {};          
 let totalM = 0;
 let guessed = JSON.parse(localStorage.getItem(KEY) || '[]'); 
 let geo = null;
 
-// Statistikas slieksņi (km)
 const LENGTH_STEPS = [5, 2, 1];
 let statTotals = {};   
 
 const map = L.map('map', {zoomControl: false}).setView([56.9496, 24.1052], 12);
 L.control.zoom({position: 'bottomright'}).addTo(map);
+
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   {maxZoom: 19, attribution: 'Tiles © Esri'}).addTo(map);
 const layerGroup = L.layerGroup().addTo(map);
@@ -19,7 +18,7 @@ const $ = id => document.getElementById(id);
 const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .replace(/[^a-z0-9]+/g, ' ').trim();
 
-// Ielu veidu vārdi (bez garumzīmēm), ko drīkst izlaist, ievadot nosaukumu
+
 const TYPES = ['iela','gatve','prospekts','bulvaris','linija','skerslinija','aleja','laukums',
   'dambis','soseja','cels','apvedcels','krastmala','tilts','pagalms','piebrauktuve','celiņs'];
 const stripType = k => {
@@ -27,6 +26,7 @@ const stripType = k => {
   return w.length > 1 && TYPES.includes(w[w.length - 1]) ? w.slice(0, -1).join(' ') : k;
 };
 let aliases = {};   
+
 const lookup = input => {
   const k = norm(input);
   if (streets[k]) return [k];
@@ -34,8 +34,8 @@ const lookup = input => {
 };
 
 // ---------- Datu ielāde ----------
-const NAME_FIELD = null;   
-const LEN_FIELD  = null;   
+const NAME_FIELD = 'nosaukums';
+const LEN_FIELD  = 'garums';   
 const LEN_UNIT   = 1;      
 
 fetch('streets.geojson')
@@ -128,8 +128,8 @@ function render(newKey) {
   $('ach').innerHTML = list.map(([on, t]) => `<div class="a ${on ? 'on' : ''}">${t}</div>`).join('');
   renderStats();
 }
-function renderStats() {
-  const rows = LENGTH_STEPS.map(t => {
+function statsRows() {
+  return LENGTH_STEPS.map(t => {
     const total = statTotals[t] || 0;
     const done = guessed.filter(k => streets[k].meters > t * 1000).length;
     const p = total ? done / total * 100 : 0;
@@ -137,7 +137,9 @@ function renderStats() {
       <div class="st-top"><span>Ielas garākas par ${t} km</span><span class="st-num"><b>${done}</b> no <b>${total}</b> (${p.toFixed(1)} %)</span></div>
       <div class="st-bar"><i style="width:${p}%"></i></div></div>`;
   }).join('');
-  $('stats').innerHTML = rows + '<p class="st-note"></p>';
+}
+function renderStats() {
+  $('stats').innerHTML = statsRows();
 }
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === b));
@@ -148,7 +150,7 @@ $('reset').onclick = () => {
   guessed = []; localStorage.removeItem(KEY); layerGroup.clearLayers(); render();
 };
 
-// ---------- Velkama apakšējā daļa (mobilajā) ----------
+// ---------- Apakšējā daļa (mobilajā) ----------
 (() => {
   const grip = $('grip'), panel = $('panel');
   let startY = null, startH = 0;
@@ -165,3 +167,33 @@ $('reset').onclick = () => {
   grip.addEventListener('pointerup', end);
   grip.addEventListener('pointercancel', end);
 })();
+
+// ---------- Spēles beigas ----------
+const fmtLen = m => m >= 1000 ? (m / 1000).toFixed(2) + ' km' : Math.round(m) + ' m';
+const topList = arr => `<ol class="top">${arr.map(k => `<li><span>${streets[k].name}</span><b>${fmtLen(streets[k].meters)}</b></li>`).join('')}</ol>`;
+function showEnd() {
+  const n = guessed.length;
+  const doneM = guessed.reduce((s, k) => s + streets[k].meters, 0);
+  const pct = totalM ? doneM / totalM * 100 : 0;
+  let html = `<div class="big">${pct.toFixed(2)} %<small>pilsētas atminēts</small></div>
+    <p class="end-sub"><b>${n}</b> no <b>${Object.keys(streets).length}</b> ielām &nbsp;·&nbsp; <b>${(doneM / 1000).toFixed(2)}</b> no <b>${(totalM / 1000).toFixed(2)}</b> km</p>`;
+  if (!n) {
+    html += '<p class="empty">Tu vēl neesi atminējis nevienu ielu.</p>';
+  } else {
+    const byLen = [...guessed].sort((a, b) => streets[b].meters - streets[a].meters);
+    html += `<h3>Pēc garuma</h3>${statsRows()}
+      <div class="end-lists">
+        <div><h3>Garākās atminētās ielas</h3>${topList(byLen.slice(0, 10))}</div>
+        <div><h3>Īsākās atminētās ielas</h3>${topList(byLen.slice(-10).reverse())}</div>
+      </div>`;
+  }
+  $('endBody').innerHTML = html;
+  $('end').hidden = false;
+  $('endClose').focus();
+}
+const hideEnd = () => { $('end').hidden = true; $('guess').focus(); };
+$('finish').onclick = showEnd;
+$('endClose').onclick = hideEnd;
+$('endReset').onclick = () => { hideEnd(); $('reset').click(); };
+$('end').addEventListener('click', e => e.target === $('end') && hideEnd());
+document.addEventListener('keydown', e => e.key === 'Escape' && !$('end').hidden && hideEnd());
