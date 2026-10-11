@@ -21,11 +21,14 @@
   </div>
   <div id="list">
     <table><thead><tr><th>Iela</th><th>%</th><th>km</th></tr></thead><tbody id="rows"></tbody></table>
-    <p id="empty" class="empty">Ievadi pirmās ielas nosaukumu!</p>
+    <p id="empty" class="empty">Ievadi pirmo ielu!</p>
   </div>
   <div id="ach" hidden></div>
   <div id="stats" hidden></div>
-  <button id="reset">Sākt no jauna</button>
+  <div class="actions">
+    <button id="finish">Beigt spēli</button>
+    <button id="reset">Sākt no jauna</button>
+  </div>
 </aside>
 
 <main>
@@ -42,6 +45,17 @@
     </div>
   </div>
 </main>
+
+<div id="end" hidden>
+  <div class="card end-card" role="dialog" aria-modal="true" aria-labelledby="endTitle">
+    <h2 id="endTitle">Spēle beigusies</h2>
+    <div id="endBody"></div>
+    <div class="end-actions">
+      <button id="endClose">Turpināt spēli</button>
+      <button id="endReset" class="ghost">Sākt no jauna</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script src="script.js"></script>
