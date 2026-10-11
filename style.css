@@ -1,12 +1,12 @@
 :root{
-  --bg:#0e131a;          /* night ink */
-  --surface:#151c26;     /* panel */
-  --raised:#1c2531;      /* inputs, cards */
+  --bg:#0e131a;          
+  --surface:#151c26;     
+  --raised:#1c2531;      
   --line:#263142;
   --text:#e8ecf2;
   --muted:#8b97a9;
   --dim:#556173;
-  --accent:#ffd23f;      /* same yellow the script uses for guessed streets */
+  --accent:#ffd23f;      
   --accent-ink:#1a1400;
   --ok:#6fd49a;
   --err:#ff8a7a;
@@ -18,7 +18,7 @@
 html,body{height:100%;margin:0}
 body{display:flex;font-family:var(--font);color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
 
-/* ---------- Side panel ---------- */
+
 #panel{width:320px;min-width:320px;padding:28px 22px 16px;overflow:hidden;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column}
 #panel>*{flex-shrink:0}
 #list,#ach,#stats{flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
@@ -32,7 +32,7 @@ h1{margin:0 0 22px;font-size:26px;font-weight:700;letter-spacing:-.02em}
 .meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
 .meta b{color:var(--text);font-weight:600}
 
-/* ---------- Tabs ---------- */
+
 .tabs{margin:26px 0 12px;border-bottom:1px solid var(--line);display:flex;gap:18px}
 .tab{background:none;border:0;padding:8px 0;font:500 13px var(--font);color:var(--muted);cursor:pointer;transition:color .15s}
 .tab:hover{color:var(--text)}
@@ -40,7 +40,7 @@ h1{margin:0 0 22px;font-size:26px;font-weight:700;letter-spacing:-.02em}
 .tab.active{color:var(--accent);border-bottom:2px solid var(--accent);margin-bottom:-1px}
 .tab.active sup{color:var(--accent)}
 
-/* ---------- Street table ---------- */
+
 table{width:100%;font-size:12px;border-collapse:collapse;font-variant-numeric:tabular-nums}
 th{text-align:right;color:var(--dim);font-weight:500;padding:6px 6px;position:sticky;top:0;background:var(--surface)}
 th:first-child{text-align:left}
@@ -51,7 +51,7 @@ tr.new td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .empty{font-style:italic;color:var(--muted);font-size:13px;line-height:1.5}
 
 
-/* ---------- Statistics ---------- */
+
 .st{padding:12px 0;border-bottom:1px solid var(--line)}
 .st-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:var(--muted)}
 .st-top b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
@@ -62,7 +62,7 @@ tr.new td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .st.full .st-top::before{content:"★ ";color:var(--accent)}
 .st-note{font-size:11px;color:var(--dim);line-height:1.5;margin:12px 0 0}
 
-/* ---------- Achievements ---------- */
+
 .a{font-size:13px;padding:11px 0;border-bottom:1px solid var(--line);color:var(--dim)}
 .a.on{color:var(--text)}
 .a.on::before{content:"★ ";color:var(--accent)}
@@ -72,7 +72,7 @@ tr.new td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 #finish:hover{color:var(--accent);border-color:var(--accent)}
 #reset:hover{color:var(--err);border-color:var(--err)}
 
-/* ---------- Map ---------- */
+
 main{flex:1;position:relative}
 #map{position:absolute;inset:0;background:var(--bg)}
 .leaflet-container{font-family:var(--font)}
@@ -82,7 +82,7 @@ main{flex:1;position:relative}
 .leaflet-control-attribution{background:#0e131acc!important;color:var(--muted)!important;font-size:10px}
 .leaflet-control-attribution a{color:var(--muted)!important}
 
-/* ---------- Search ---------- */
+
 #search{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:1000;width:min(440px,70%);display:flex;flex-wrap:wrap;background:#151c26ee;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px #0008;overflow:hidden}
 #search:focus-within{border-color:var(--accent)}
 #search input{flex:1;min-width:0;border:0;background:transparent;color:var(--text);padding:13px 14px;font:16px var(--font);outline:none}
@@ -96,7 +96,7 @@ main{flex:1;position:relative}
 #msg.err{color:var(--err)}
 #msg.ok{color:var(--ok)}
 
-/* ---------- Loader ---------- */
+
 #loader{position:absolute;inset:0;z-index:2000;background:#0e131af2;display:flex;align-items:center;justify-content:center}
 #loader[hidden]{display:none}
 .card{background:var(--surface);border:1px solid var(--line);padding:28px;max-width:440px;box-shadow:0 20px 60px #000a;border-radius:12px;font-size:14px;color:var(--text)}
@@ -109,7 +109,7 @@ main{flex:1;position:relative}
 .card button:hover{filter:brightness(1.1)}
 
 
-/* ---------- End of game ---------- */
+
 #end{position:fixed;inset:0;z-index:3000;background:#0e131af2;display:flex;align-items:center;justify-content:center;padding:16px}
 #end[hidden]{display:none}
 .end-card{width:100%;max-width:560px;max-height:100%;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
@@ -129,12 +129,12 @@ ol.top li b{font-weight:500;color:var(--muted);white-space:nowrap;font-variant-n
 .card button.ghost:hover{filter:none;color:var(--err);border-color:var(--err)}
 @media(max-width:700px){.end-lists{grid-template-columns:1fr}}
 
-/* ---------- Accessibility ---------- */
+
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 #search input:focus-visible{outline:none}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 
-/* ---------- Mobile ---------- */
+
 #grip{display:none}
 
 @media(max-width:700px){
