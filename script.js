@@ -132,3 +132,21 @@ $('reset').onclick = () => {
   if (!confirm('Dzēst visu progresu?')) return;
   guessed = []; localStorage.removeItem(KEY); layerGroup.clearLayers(); render();
 };
+
+// ---------- Velkama apakšējā daļa (mobilajā) ----------
+(() => {
+  const grip = $('grip'), panel = $('panel');
+  let startY = null, startH = 0;
+  grip.addEventListener('pointerdown', e => {
+    startY = e.clientY; startH = panel.offsetHeight;
+    grip.setPointerCapture(e.pointerId);
+  });
+  grip.addEventListener('pointermove', e => {
+    if (startY === null) return;
+    const h = Math.min(innerHeight * 0.85, Math.max(130, startH + startY - e.clientY));
+    panel.style.setProperty('--ph', h + 'px');
+  });
+  const end = () => { if (startY === null) return; startY = null; map.invalidateSize(); };
+  grip.addEventListener('pointerup', end);
+  grip.addEventListener('pointercancel', end);
+})();
