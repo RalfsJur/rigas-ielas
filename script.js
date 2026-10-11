@@ -5,6 +5,11 @@ let totalM = 0;
 let guessed = JSON.parse(localStorage.getItem(KEY) || '[]'); // normalizētu nosaukumu saraksts
 let geo = null;
 
+// Statistikas slieksņi (km): cik no ielām, kas garākas par X km, ir atminētas.
+// Vari brīvi pievienot vai izņemt vērtības, piem., [10, 5, 2, 1, 0.5]
+const LENGTH_STEPS = [5, 2, 1];
+let statTotals = {};   // slieksnis (km) -> ielu skaits pilsētā
+
 const map = L.map('map', {zoomControl: false}).setView([56.9496, 24.1052], 12);
 L.control.zoom({position: 'bottomright'}).addTo(map);
 // Tikai satelīta attēli (bez ielu nosaukumiem)
@@ -66,6 +71,8 @@ function startGame() {
     const base = stripType(k);
     if (base !== k && /[a-z]/.test(base)) (aliases[base] ||= []).push(k); // "1. līnija" bez veida netiek saīsināta
   }
+  statTotals = {};
+  for (const t of LENGTH_STEPS) statTotals[t] = Object.values(streets).filter(x => x.meters > t * 1000).length;
   guessed = guessed.filter(k => streets[k]);
   $('loader').hidden = true;
   $('guess').disabled = $('go').disabled = false;
@@ -123,10 +130,22 @@ function render(newKey) {
   const list = [...ACH.map(([n, t]) => [guessed.length >= n, t]), ...PCT.map(([n, t]) => [pct >= n, t])];
   $('achCnt').textContent = list.filter(a => a[0]).length;
   $('ach').innerHTML = list.map(([on, t]) => `<div class="a ${on ? 'on' : ''}">${t}</div>`).join('');
+  renderStats();
+}
+function renderStats() {
+  const rows = LENGTH_STEPS.map(t => {
+    const total = statTotals[t] || 0;
+    const done = guessed.filter(k => streets[k].meters > t * 1000).length;
+    const p = total ? done / total * 100 : 0;
+    return `<div class="st ${total && done === total ? 'full' : ''}">
+      <div class="st-top"><span>Ielas garākas par ${t} km</span><span class="st-num"><b>${done}</b> no <b>${total}</b> (${p.toFixed(1)} %)</span></div>
+      <div class="st-bar"><i style="width:${p}%"></i></div></div>`;
+  }).join('');
+  $('stats').innerHTML = rows + '<p class="st-note">Garums ir summēts visiem ielas posmiem ar vienādu nosaukumu.</p>';
 }
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === b));
-  $('list').hidden = b.dataset.tab !== 'list'; $('ach').hidden = b.dataset.tab !== 'ach';
+  for (const id of ['list', 'ach', 'stats']) $(id).hidden = b.dataset.tab !== id;
 });
 $('reset').onclick = () => {
   if (!confirm('Dzēst visu progresu?')) return;
