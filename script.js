@@ -1,13 +1,16 @@
 // ---- Rīgas ielu spēle ----
 const KEY = 'rigas_ielas_v1';
-let streets = {};          // normalizēts nosaukums -> {name, meters, layers: []}
+let streets = {};          
 let totalM = 0;
-let guessed = JSON.parse(localStorage.getItem(KEY) || '[]'); // normalizētu nosaukumu saraksts
+let guessed = JSON.parse(localStorage.getItem(KEY) || '[]'); 
 let geo = null;
+
+// Statistikas slieksņi (km)
+const LENGTH_STEPS = [5, 2, 1];
+let statTotals = {};   
 
 const map = L.map('map', {zoomControl: false}).setView([56.9496, 24.1052], 12);
 L.control.zoom({position: 'bottomright'}).addTo(map);
-// Tikai satelīta attēli (bez ielu nosaukumiem)
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   {maxZoom: 19, attribution: 'Tiles © Esri'}).addTo(map);
 const layerGroup = L.layerGroup().addTo(map);
@@ -23,8 +26,7 @@ const stripType = k => {
   const w = k.split(' ');
   return w.length > 1 && TYPES.includes(w[w.length - 1]) ? w.slice(0, -1).join(' ') : k;
 };
-let aliases = {};   // nosaukums bez veida -> [pilnie atslēgu nosaukumi]
-// Atrod ielas pēc ievades: pilns nosaukums vai nosaukums bez veida (piem., "Jelgavas")
+let aliases = {};   
 const lookup = input => {
   const k = norm(input);
   if (streets[k]) return [k];
@@ -32,10 +34,9 @@ const lookup = input => {
 };
 
 // ---------- Datu ielāde ----------
-// Ja automātiskā lauku atpazīšana kļūdās, norādi lauku nosaukumus šeit:
-const NAME_FIELD = null;   // piem., 'nosaukums'
-const LEN_FIELD  = null;   // piem., 'garums'
-const LEN_UNIT   = 1;      // 1 = metri, 1000 = kilometri
+const NAME_FIELD = null;   
+const LEN_FIELD  = null;   
+const LEN_UNIT   = 1;      
 
 fetch('streets.geojson')
   .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
@@ -64,8 +65,10 @@ function startGame() {
   aliases = {};
   for (const k of Object.keys(streets)) {
     const base = stripType(k);
-    if (base !== k && /[a-z]/.test(base)) (aliases[base] ||= []).push(k); // "1. līnija" bez veida netiek saīsināta
+    if (base !== k && /[a-z]/.test(base)) (aliases[base] ||= []).push(k); 
   }
+  statTotals = {};
+  for (const t of LENGTH_STEPS) statTotals[t] = Object.values(streets).filter(x => x.meters > t * 1000).length;
   guessed = guessed.filter(k => streets[k]);
   $('loader').hidden = true;
   $('guess').disabled = $('go').disabled = false;
@@ -123,10 +126,22 @@ function render(newKey) {
   const list = [...ACH.map(([n, t]) => [guessed.length >= n, t]), ...PCT.map(([n, t]) => [pct >= n, t])];
   $('achCnt').textContent = list.filter(a => a[0]).length;
   $('ach').innerHTML = list.map(([on, t]) => `<div class="a ${on ? 'on' : ''}">${t}</div>`).join('');
+  renderStats();
+}
+function renderStats() {
+  const rows = LENGTH_STEPS.map(t => {
+    const total = statTotals[t] || 0;
+    const done = guessed.filter(k => streets[k].meters > t * 1000).length;
+    const p = total ? done / total * 100 : 0;
+    return `<div class="st ${total && done === total ? 'full' : ''}">
+      <div class="st-top"><span>Ielas garākas par ${t} km</span><span class="st-num"><b>${done}</b> no <b>${total}</b> (${p.toFixed(1)} %)</span></div>
+      <div class="st-bar"><i style="width:${p}%"></i></div></div>`;
+  }).join('');
+  $('stats').innerHTML = rows + '<p class="st-note"></p>';
 }
 document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
   document.querySelectorAll('.tab').forEach(x => x.classList.toggle('active', x === b));
-  $('list').hidden = b.dataset.tab !== 'list'; $('ach').hidden = b.dataset.tab !== 'ach';
+  for (const id of ['list', 'ach', 'stats']) $(id).hidden = b.dataset.tab !== id;
 });
 $('reset').onclick = () => {
   if (!confirm('Dzēst visu progresu?')) return;
