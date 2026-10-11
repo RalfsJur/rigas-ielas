@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rīgas ielas</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<aside id="panel">
+  <h1>Rīgas ielas</h1>
+  <div class="big"><span id="pct">0</span> %<small>atminēts</small></div>
+  <div class="bar"><div id="barFill"></div></div>
+  <div class="meta"><span id="kmDone">0 km atminēts</span><span>Ielas: <b id="cnt">0</b></span></div>
+  <div class="tabs">
+    <button class="tab active" data-tab="list">Atminētās ielas <sup id="cnt2">0</sup></button>
+    <button class="tab" data-tab="ach">Sasniegumi <sup id="achCnt">0</sup></button>
+  </div>
+  <div id="list">
+    <table><thead><tr><th>Iela</th><th>%</th><th>km</th></tr></thead><tbody id="rows"></tbody></table>
+    <p id="empty" class="empty">Sāc ar pazīstamām ielām.</p>
+  </div>
+  <div id="ach" hidden></div>
+  <button id="reset">Sākt no jauna</button>
+</aside>
+
+<main>
+  <div id="map"></div>
+  <div id="search">
+    <input id="guess" type="text" placeholder="Ievadi minējumu!" autocomplete="off" disabled>
+    <button id="go" disabled>↵</button>
+    <div id="msg"></div>
+  </div>
+  <div id="loader">
+    <div class="card">
+      <h2>Ielādē datus…</h2>
+      <p id="loadStatus"></p>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
