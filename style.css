@@ -21,7 +21,7 @@ body{display:flex;font-family:var(--font);color:var(--text);background:var(--bg)
 /* ---------- Side panel ---------- */
 #panel{width:320px;min-width:320px;padding:28px 22px 16px;overflow:hidden;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column}
 #panel>*{flex-shrink:0}
-#list,#ach{flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+#list,#ach,#stats{flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
 h1{margin:0 0 22px;font-size:26px;font-weight:700;letter-spacing:-.02em}
 
 .big{font-size:56px;font-weight:700;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
@@ -33,7 +33,7 @@ h1{margin:0 0 22px;font-size:26px;font-weight:700;letter-spacing:-.02em}
 .meta b{color:var(--text);font-weight:600}
 
 /* ---------- Tabs ---------- */
-.tabs{margin:26px 0 12px;border-bottom:1px solid var(--line);display:flex;gap:20px}
+.tabs{margin:26px 0 12px;border-bottom:1px solid var(--line);display:flex;gap:18px}
 .tab{background:none;border:0;padding:8px 0;font:500 13px var(--font);color:var(--muted);cursor:pointer;transition:color .15s}
 .tab:hover{color:var(--text)}
 .tab sup{color:var(--dim);font-size:10px;margin-left:2px}
@@ -49,6 +49,18 @@ td:first-child{text-align:left;color:var(--text)}
 tr.new td{background:#ffd23f1f;color:var(--text)}
 tr.new td:first-child{box-shadow:inset 3px 0 0 var(--accent)}
 .empty{font-style:italic;color:var(--muted);font-size:13px;line-height:1.5}
+
+
+/* ---------- Statistics ---------- */
+.st{padding:12px 0;border-bottom:1px solid var(--line)}
+.st-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:13px;color:var(--muted)}
+.st-top b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+.st-num{white-space:nowrap;font-variant-numeric:tabular-nums}
+.st-bar{height:4px;background:var(--raised);border-radius:2px;margin-top:8px;overflow:hidden}
+.st-bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:2px;transition:width .5s cubic-bezier(.2,.8,.2,1)}
+.st.full .st-top{color:var(--text)}
+.st.full .st-top::before{content:"★ ";color:var(--accent)}
+.st-note{font-size:11px;color:var(--dim);line-height:1.5;margin:12px 0 0}
 
 /* ---------- Achievements ---------- */
 .a{font-size:13px;padding:11px 0;border-bottom:1px solid var(--line);color:var(--dim)}
@@ -109,6 +121,6 @@ main{flex:1;position:relative}
   #grip::after{content:"";position:absolute;left:50%;top:12px;width:44px;height:4px;margin-left:-22px;border-radius:2px;background:var(--dim)}
   h1{font-size:20px;margin-bottom:12px}
   .big{font-size:38px}
-  .tabs{margin-top:16px}
+  .tabs{margin-top:16px;gap:14px}
   #search{width:calc(100% - 32px)}
 }
