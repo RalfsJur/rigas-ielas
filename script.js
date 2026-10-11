@@ -1,18 +1,16 @@
 // ---- Rīgas ielu spēle ----
 const KEY = 'rigas_ielas_v1';
-let streets = {};          // normalizēts nosaukums -> {name, meters, layers: []}
+let streets = {};          
 let totalM = 0;
-let guessed = JSON.parse(localStorage.getItem(KEY) || '[]'); // normalizētu nosaukumu saraksts
+let guessed = JSON.parse(localStorage.getItem(KEY) || '[]'); 
 let geo = null;
 
-// Statistikas slieksņi (km): cik no ielām, kas garākas par X km, ir atminētas.
-// Vari brīvi pievienot vai izņemt vērtības, piem., [10, 5, 2, 1, 0.5]
 const LENGTH_STEPS = [5, 2, 1];
-let statTotals = {};   // slieksnis (km) -> ielu skaits pilsētā
+let statTotals = {};   
 
 const map = L.map('map', {zoomControl: false}).setView([56.9496, 24.1052], 12);
 L.control.zoom({position: 'bottomright'}).addTo(map);
-// Tikai satelīta attēli (bez ielu nosaukumiem)
+
 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   {maxZoom: 19, attribution: 'Tiles © Esri'}).addTo(map);
 const layerGroup = L.layerGroup().addTo(map);
@@ -21,23 +19,22 @@ const $ = id => document.getElementById(id);
 const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
   .replace(/[^a-z0-9]+/g, ' ').trim();
 
-// Ielu veidu vārdi (bez garumzīmēm), ko drīkst izlaist, ievadot nosaukumu
+
 const TYPES = ['iela','gatve','prospekts','bulvaris','linija','skerslinija','aleja','laukums',
   'dambis','soseja','cels','apvedcels','krastmala','tilts','pagalms','piebrauktuve','celiņs'];
 const stripType = k => {
   const w = k.split(' ');
   return w.length > 1 && TYPES.includes(w[w.length - 1]) ? w.slice(0, -1).join(' ') : k;
 };
-let aliases = {};   // nosaukums bez veida -> [pilnie atslēgu nosaukumi]
-// Atrod ielas pēc ievades: pilns nosaukums vai nosaukums bez veida (piem., "Jelgavas")
+let aliases = {};   
+
 const lookup = input => {
   const k = norm(input);
   if (streets[k]) return [k];
   return aliases[stripType(k)] || [];
 };
 
-// ---------- Datu ielāde ----------
-// Ja automātiskā lauku atpazīšana kļūdās, norādi lauku nosaukumus šeit:
+
 const NAME_FIELD = 'nosaukums';
 const LEN_FIELD  = 'garums';   // metros
 const LEN_UNIT   = 1;      // 1 = metri, 1000 = kilometri
@@ -69,7 +66,7 @@ function startGame() {
   aliases = {};
   for (const k of Object.keys(streets)) {
     const base = stripType(k);
-    if (base !== k && /[a-z]/.test(base)) (aliases[base] ||= []).push(k); // "1. līnija" bez veida netiek saīsināta
+    if (base !== k && /[a-z]/.test(base)) (aliases[base] ||= []).push(k); 
   }
   statTotals = {};
   for (const t of LENGTH_STEPS) statTotals[t] = Object.values(streets).filter(x => x.meters > t * 1000).length;
@@ -81,7 +78,7 @@ function startGame() {
   render();
 }
 
-// ---------- Spēles loģika ----------
+
 function draw(k) {
   const gj = L.geoJSON(streets[k].features, {style: {color: '#ffd23f', weight: 4, opacity: 1}});
   gj.addTo(layerGroup);
@@ -112,7 +109,6 @@ function submit() {
 $('go').onclick = submit;
 $('guess').addEventListener('keydown', e => e.key === 'Enter' && submit());
 
-// ---------- Interfeiss ----------
 const ACH = [[1, 'Pirmā iela'], [10, '10 ielas'], [50, '50 ielas'], [100, '100 ielas'], [250, '250 ielas'], [500, '500 ielas'], [1000, '1000 ielas']];
 const PCT = [[1, '1% pilsētas'], [5, '5% pilsētas'], [10, '10% pilsētas'], [25, '25% pilsētas'], [50, 'Puse pilsētas'], [75, '75% pilsētas'], [100, 'Visa Rīga!']];
 function render(newKey) {
@@ -154,7 +150,7 @@ $('reset').onclick = () => {
   guessed = []; localStorage.removeItem(KEY); layerGroup.clearLayers(); render();
 };
 
-// ---------- Velkama apakšējā daļa (mobilajā) ----------
+
 (() => {
   const grip = $('grip'), panel = $('panel');
   let startY = null, startH = 0;
@@ -172,7 +168,7 @@ $('reset').onclick = () => {
   grip.addEventListener('pointercancel', end);
 })();
 
-// ---------- Spēles beigas ----------
+
 const fmtLen = m => m >= 1000 ? (m / 1000).toFixed(2) + ' km' : Math.round(m) + ' m';
 const topList = arr => `<ol class="top">${arr.map(k => `<li><span>${streets[k].name}</span><b>${fmtLen(streets[k].meters)}</b></li>`).join('')}</ol>`;
 function showEnd() {
